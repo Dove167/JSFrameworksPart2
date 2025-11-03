@@ -89,8 +89,8 @@
 - [x] Mandatory items: Card, Image, Your Name, Description
 - [x] Responsive Project Preview Card
 - [x] Mandatory Details: Customizable # of Projects, Same Sized Cards, Consistent Tailwind Styling
-- [ ] Screenshots: Full page (mobile & desktop)
-- [ ] GitHub: Commit/push to new repo, provide link
+- [x] Screenshots: Full page (mobile & desktop)
+- [x] GitHub: Commit/push to new repo, provide link
 
 ## Notes
 - All styling: Tailwind CSS only.
