@@ -12,6 +12,7 @@ export const metadata = {
 };
 
 import MyNavBar from "@/components/MyNavBar";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function RootLayout({ children }) {
   return (
@@ -23,6 +24,7 @@ export default function RootLayout({ children }) {
           <MyNavBar />
         </header>
         <main className="min-h-screen w-full">{children}</main>
+        <Toaster />
       </body>
     </html>
   );

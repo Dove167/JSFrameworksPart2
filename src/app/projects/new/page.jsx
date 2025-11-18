@@ -4,6 +4,7 @@ import { useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 
 import {
   Form,
@@ -33,26 +34,23 @@ const newProjectSchema = z.object({
 
 export default function NewProjectPage() {
   const [draftKeyword, setDraftKeyword] = useState("");
-  const [submitState, setSubmitState] = useState({
-    status: "idle",
-    message: "",
-  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(newProjectSchema),
     defaultValues: {
-      title: "Write your project title here...",
-      description: "Write your project description here...",
+      title: "",
+      description: "",
       img: "https://placehold.co/300x200",
-      link: "https://your-project-link.com",
+      link: "",
       keywords: [],
     },
   });
 
   async function onSubmit(values) {
+    setIsSubmitting(true);
+    
     try {
-      setSubmitState({ status: "submitting", message: "" });
-
       const formData = new FormData();
       formData.append("title", values.title);
       formData.append("description", values.description);
@@ -67,32 +65,27 @@ export default function NewProjectPage() {
 
       const data = await res.json();
 
-      if (!res.ok || !data.ok) {
-        throw new Error(data.error || "Failed to create project");
+      if (data.ok) {
+        // Reset form after successful submission
+        form.reset({
+          title: "",
+          description: "",
+          img: "https://placehold.co/300x200",
+          link: "",
+          keywords: [],
+        });
+        setDraftKeyword("");
+        toast.success("Project created successfully! Check server logs.");
+      } else {
+        // Handle API error
+        toast.error(`Failed to create project: ${data.error || "Unknown error"}`);
       }
-
-      setSubmitState({
-        status: "success",
-        message: "Project submitted successfully. Check server logs.",
-      });
-
-      // Optional: reset but keep keywords empty for clarity
-      form.reset({
-        title: "",
-        description: "",
-        img: "",
-        link: "",
-        keywords: [],
-      });
-      setDraftKeyword("");
-    } catch (err) {
-      setSubmitState({
-        status: "error",
-        message:
-          err instanceof Error
-            ? err.message
-            : "Unexpected error while submitting project",
-      });
+      
+    } catch (error) {
+      console.error("Error submitting project:", error);
+      toast.error("Failed to create project. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -284,22 +277,36 @@ export default function NewProjectPage() {
           <div className="flex items-center gap-3 pt-2">
             <Button
               type="submit"
-              disabled={submitState.status === "submitting"}
+              disabled={isSubmitting}
             >
-              {submitState.status === "submitting"
-                ? "Submitting..."
-                : "Submit"}
+              {isSubmitting
+                ? (
+                  <>
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Creating Project...
+                  </>
+                )
+                : "Create Project"}
             </Button>
-            {submitState.status === "success" && (
-              <p className="text-xs text-emerald-600">
-                {submitState.message}
-              </p>
-            )}
-            {submitState.status === "error" && (
-              <p className="text-xs text-red-600">
-                {submitState.message}
-              </p>
-            )}
           </div>
         </form>
       </Form>
