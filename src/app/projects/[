@@ -1,35 +1,30 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { useUser } from "@auth0/nextjs-auth0/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { createSlug } from "@/lib/utils";
 
-async function getProjects() {
+async function getProject(id) {
   const baseUrl =
     process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
-  const res = await fetch(`${baseUrl}/api/projects`, {
+  const res = await fetch(`${baseUrl}/api/projects/${id}`, {
     cache: "no-store",
   });
 
   if (!res.ok) {
-    throw new Error("Failed to fetch projects");
+    return null;
   }
 
   const data = await res.json();
-  return data.projects || [];
+  return data.data || null;
 }
 
 export default async function ProjectDetailPage({ params }) {
-  const { slug } = await params;
-  const projects = await getProjects();
-
-  const project =
-    projects.find(
-      (p) => createSlug(p.title) === slug
-    ) || null;
+  const { uuid } = await params;
+  const project = await getProject(uuid);
 
   if (!project) {
     notFound();
@@ -46,20 +41,23 @@ export default async function ProjectDetailPage({ params }) {
             Detailed view loaded from
             {" "}
             <code className="rounded bg-muted px-1 py-0.5 text-xs">
-              /api/projects
+              /api/projects/{uuid}
             </code>
             .
           </p>
         </div>
-        <Button asChild size="sm" variant="outline">
-          <Link href="/projects">Back to Projects</Link>
-        </Button>
+        <div className="flex gap-2">
+          <Button asChild size="sm" variant="outline">
+            <Link href="/projects">Back to Projects</Link>
+          </Button>
+          <AuthProjectControls projectId={project.id} />
+        </div>
       </div>
 
       <Card className="flex flex-col gap-6 p-4 md:flex-row">
         <div className="relative h-56 w-full overflow-hidden rounded-md bg-slate-100 md:h-64 md:w-1/2">
           <Image
-            src={project.image}
+            src={project.img}
             alt={project.title}
             fill
             sizes="(max-width: 768px) 100vw, 50vw"
@@ -99,5 +97,32 @@ export default async function ProjectDetailPage({ params }) {
         </div>
       </Card>
     </section>
+  );
+}
+
+function AuthProjectControls({ projectId }) {
+  // This is a client component wrapper for auth checks
+  return (
+    <ClientProjectControls projectId={projectId} />
+  );
+}
+
+"use client";
+
+import { useUser } from "@auth0/nextjs-auth0/client";
+
+function ClientProjectControls({ projectId }) {
+  const { user } = useUser();
+
+  if (!user) {
+    return null;
+  }
+
+  return (
+    <>
+      <Button asChild size="sm" variant="outline">
+        <Link href={`/projects/${projectId}/edit`}>Edit</Link>
+      </Button>
+    </>
   );
 }
