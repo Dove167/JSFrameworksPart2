@@ -1,4 +1,4 @@
-import { fetchProjects } from "@/src/lib/db";
+import { fetchProjects } from "@/lib/db";
 
 export async function GET() {
   try {

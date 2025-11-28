@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { auth0 } from "@/src/lib/auth0";
-import { getProjectById, updateProject, deleteProject } from "@/src/lib/db";
+import { auth0 } from "@/lib/auth0";
+import { getProjectById, updateProject, deleteProject } from "@/lib/db";
 
 const projectUpdateSchema = z.object({
   title: z.string().min(1).optional(),
@@ -11,7 +11,7 @@ const projectUpdateSchema = z.object({
   keywords: z.array(z.string()).optional(),
 });
 
-// GET /api/projects/[uuid] - Get a specific project
+// GET /api/projects/[uuid] - Get a specific project (public)
 export async function GET(request, { params }) {
   try {
     const project = await getProjectById(params.uuid);
@@ -25,7 +25,7 @@ export async function GET(request, { params }) {
   }
 }
 
-// PUT /api/projects/[uuid] - Update a specific project
+// PUT /api/projects/[uuid] - Update a specific project (protected)
 export async function PUT(request, { params }) {
   try {
     await auth0.requireSession();
@@ -54,7 +54,7 @@ export async function PUT(request, { params }) {
   }
 }
 
-// DELETE /api/projects/[uuid] - Delete a specific project
+// DELETE /api/projects/[uuid] - Delete a specific project (protected)
 export async function DELETE(request, { params }) {
   try {
     await auth0.requireSession();

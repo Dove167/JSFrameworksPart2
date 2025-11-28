@@ -1,5 +1,5 @@
-import { auth0 } from "@/src/lib/auth0";
-import { insertProject } from "@/src/lib/db";
+import { auth0 } from "@/lib/auth0";
+import { insertProject } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 

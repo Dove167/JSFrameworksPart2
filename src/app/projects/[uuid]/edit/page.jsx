@@ -1,6 +1,6 @@
-import { getProjectById } from "@/src/lib/db";
+import { getProjectById } from "@/lib/db";
 import { notFound } from "next/navigation";
-import EditProjectForm from "@/src/components/EditProjectForm";
+import EditProjectForm from "@/components/EditProjectForm";
 
 export default async function EditProjectPage({ params }) {
   const project = await getProjectById(params.uuid);
