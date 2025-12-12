@@ -14,6 +14,14 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'lipsum.app',
       },
+      {
+        protocol: 'https',
+        hostname: 'github.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.github.com',
+      },
     ],
   },
 };

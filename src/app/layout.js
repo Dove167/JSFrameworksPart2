@@ -15,12 +15,13 @@ import MyNavBar from "@/components/MyNavBar";
 import { Toaster } from "@/components/ui/sonner";
 import { Auth0Provider } from "@auth0/nextjs-auth0/client";
 import { auth0 } from "@/lib/auth0";
+import PageTransition from "@/components/PageTransition";
 
 export default async function RootLayout({ children }) {
   const session = await auth0.getSession();
 
   return (
-    <html lang="en">
+    <html lang="en" className="scroll-smooth">
       <Auth0Provider user={session?.user}>
         <body
           className={`${robotoMono.variable} antialiased`}
@@ -28,7 +29,11 @@ export default async function RootLayout({ children }) {
           <header className="sticky top-0 z-50 bg-white shadow-sm">
             <MyNavBar />
           </header>
-          <main className="min-h-screen w-full">{children}</main>
+          <main className="min-h-screen w-full">
+            <PageTransition>
+              {children}
+            </PageTransition>
+          </main>
           <Toaster />
         </body>
       </Auth0Provider>
