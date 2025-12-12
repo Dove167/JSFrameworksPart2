@@ -1,14 +1,22 @@
 "use client";
 
-import { useUser } from "@auth0/nextjs-auth0/client";
+import { useUser } from "@auth0/nextjs-auth0";
 
 export default function Profile() {
-  const { user, isLoading } = useUser();
+  const { user, isLoading, error } = useUser();
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center">
         <div className="text-sm text-muted-foreground">Loading user profile...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-sm text-red-600">
+        Error loading profile: {error.message}
       </div>
     );
   }
