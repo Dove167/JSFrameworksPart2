@@ -47,7 +47,7 @@ export default function LoginButton() {
 
   return (
     <motion.a
-      href="/auth/login"
+      href="/api/auth/login"
       className="inline-flex items-center justify-center rounded-md bg-blue-600 px-6 py-3 text-sm font-medium text-white hover:bg-blue-700 transition-colors relative overflow-hidden"
       variants={buttonVariants}
       initial="hidden"
