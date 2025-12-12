@@ -11,32 +11,12 @@ export const metadata = {
   description: "A modern Next.js portfolio built with Tailwind CSS and shadcn/ui",
 };
 
-import MyNavBar from "@/components/MyNavBar";
-import { Toaster } from "@/components/ui/sonner";
-import { Auth0Provider } from "@auth0/nextjs-auth0/client";
-import { auth0 } from "@/lib/auth0";
-import PageTransition from "@/components/PageTransition";
+import ClientLayout from "./ClientLayout";
 
-export default async function RootLayout({ children }) {
-  const session = await auth0.getSession();
-
+export default function RootLayout({ children }) {
   return (
-    <html lang="en" className="scroll-smooth">
-      <Auth0Provider user={session?.user}>
-        <body
-          className={`${robotoMono.variable} antialiased`}
-        >
-          <header className="sticky top-0 z-50 bg-white shadow-sm">
-            <MyNavBar />
-          </header>
-          <main className="min-h-screen w-full">
-            <PageTransition>
-              {children}
-            </PageTransition>
-          </main>
-          <Toaster />
-        </body>
-      </Auth0Provider>
-    </html>
+    <ClientLayout>
+      {children}
+    </ClientLayout>
   );
 }

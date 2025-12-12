@@ -6,7 +6,14 @@ export const auth0 = new Auth0Client({
   clientSecret: process.env.AUTH0_CLIENT_SECRET,
   appBaseUrl: process.env.APP_BASE_URL || process.env.AUTH0_BASE_URL,
   secret: process.env.AUTH0_SECRET,
-  authorizationParameters: {
-    redirect_uri: `${process.env.APP_BASE_URL || process.env.AUTH0_BASE_URL}/api/auth/callback`,
+  routes: {
+    login: "/auth/login",
+    logout: "/auth/logout", 
+    callback: "/auth/callback"
   },
+  session: {
+    cookie: {
+      name: 'awesome_portfolio_session'
+    }
+  }
 });
