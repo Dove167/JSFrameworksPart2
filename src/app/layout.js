@@ -13,19 +13,22 @@ export const metadata = {
 
 import MyNavBar from "@/components/MyNavBar";
 import { Toaster } from "@/components/ui/sonner";
+import { Auth0Provider } from "@auth0/nextjs-auth0/client";
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body
-        className={`${robotoMono.variable} antialiased`}
-      >
-        <header className="sticky top-0 z-50 bg-white shadow-sm">
-          <MyNavBar />
-        </header>
-        <main className="min-h-screen w-full">{children}</main>
-        <Toaster />
-      </body>
+      <Auth0Provider>
+        <body
+          className={`${robotoMono.variable} antialiased`}
+        >
+          <header className="sticky top-0 z-50 bg-white shadow-sm">
+            <MyNavBar />
+          </header>
+          <main className="min-h-screen w-full">{children}</main>
+          <Toaster />
+        </body>
+      </Auth0Provider>
     </html>
   );
 }

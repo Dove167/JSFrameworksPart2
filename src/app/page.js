@@ -3,6 +3,8 @@ import MyHeroSection from "../components/MyHeroSection";
 import ProjectPreviewCard from "../components/project-preview-card";
 import { FullGitHubCalendar } from "../components/github-calendar";
 
+export const revalidate = 0;
+
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen w-full">

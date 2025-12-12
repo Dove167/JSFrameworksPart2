@@ -1,38 +1,55 @@
-import { getCurrentUser } from '@/lib/simpleAuth';
+"use client";
 
-export default async function DashboardPage() {
-  const user = getCurrentUser();
-  
-  if (!user) {
+import { useUser } from '@auth0/nextjs-auth0/client';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import HeroEditorForm from '@/components/hero-editor-form';
+
+export default function DashboardPage() {
+  const { user, error, isLoading } = useUser();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.push('/api/auth/login');
+    }
+  }, [isLoading, user, router]);
+
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-semibold mb-4">Access Denied</h1>
-          <p className="mb-4">Please log in to access the dashboard.</p>
-          <p className="text-sm text-gray-600 mb-4">Use the mock authentication by running this in browser console:</p>
-          <code className="bg-gray-100 px-2 py-1 rounded text-xs">
-            localStorage.setItem('lab4_auth', 'true'); location.reload();
-          </code>
-        </div>
+        <p>Loading dashboard...</p>
       </div>
     );
   }
 
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-red-500">Error: {error.message}</p>
+      </div>
+    );
+  }
+
+  if (!user) return null;
+
   return (
-    <section className="min-h-screen flex flex-col items-center gap-3 p-8">
-      <h1 className="text-3xl font-semibold">Dashboard</h1>
-      <p className="text-muted-foreground">Welcome {user.name}</p>
-      <p className="text-sm text-muted-foreground">Email: {user.email}</p>
+    <section className="min-h-screen flex flex-col items-center gap-8 p-8">
+      <div className="text-center space-y-2">
+        <h1 className="text-3xl font-semibold">Dashboard</h1>
+        <p className="text-muted-foreground">Welcome, {user.name}</p>
+        <p className="text-sm text-muted-foreground">{user.email}</p>
+      </div>
+      
+      <HeroEditorForm />
+
       <div className="mt-4">
-        <button 
-          onClick={() => {
-            localStorage.removeItem('lab4_auth');
-            location.reload();
-          }}
-          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+        <a 
+          href="/api/auth/logout"
+          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 inline-block transition-colors"
         >
           Logout
-        </button>
+        </a>
       </div>
     </section>
   );

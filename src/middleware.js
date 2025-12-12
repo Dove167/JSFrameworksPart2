@@ -1,10 +1,7 @@
-import type { NextRequest } from "next/server";
+import { auth0 } from "@/lib/auth0";
 
-// Basic middleware configuration
-// Authentication protection will be handled by individual route handlers
-export async function middleware(request: NextRequest) {
-  // Pass through for now - Auth0 SDK handles auth in route handlers
-  // Let the request continue normally
+export async function middleware(request) {
+  return await auth0.middleware(request);
 }
 
 export const config = {

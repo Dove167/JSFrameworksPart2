@@ -291,4 +291,131 @@ export async function deleteProject(id) {
   return mapRow(rows[0]);
 }
 
+const HERO_PLACEHOLDER_AVATAR =
+  'data:image/gif;base64,R0lGODlhAQABAAAAACw=';
+
+const defaultHeroContent = {
+  fullName: 'Your Name',
+  shortDescription: 'Professional Developer & Designer',
+  longDescription:
+    'This is a longer description about yourself. You can edit this in the dashboard to tell your story, share your background, and describe your professional journey.',
+  avatar: HERO_PLACEHOLDER_AVATAR,
+};
+
+async function ensureHeroTable() {
+  await sql`
+    CREATE TABLE IF NOT EXISTS hero (
+      id uuid PRIMARY KEY,
+      avatar text,
+      full_name text,
+      short_description varchar(120),
+      long_description text,
+      created_at timestamptz NOT NULL DEFAULT now(),
+      updated_at timestamptz NOT NULL DEFAULT now()
+    )
+  `;
+
+  const [{ count }] = await sql`SELECT COUNT(*)::int AS count FROM hero`;
+  if (Number(count) === 0) {
+    await sql`
+      INSERT INTO hero (id, full_name, short_description, long_description, avatar)
+      VALUES (
+        ${randomUUID()}::uuid,
+        ${defaultHeroContent.fullName},
+        ${defaultHeroContent.shortDescription},
+        ${defaultHeroContent.longDescription},
+        ${defaultHeroContent.avatar}
+      )
+    `;
+  }
+}
+
+export async function getHero() {
+  await ensureHeroTable();
+  const rows = await sql`
+    SELECT
+      id,
+      full_name as "fullName",
+      short_description as "shortDescription",
+      long_description as "longDescription",
+      avatar,
+      created_at as "createdAt",
+      updated_at as "updatedAt"
+    FROM hero
+    LIMIT 1
+  `;
+
+  if (rows.length === 0) {
+    return defaultHeroContent;
+  }
+
+  return { ...defaultHeroContent, ...rows[0] };
+}
+
+export async function upsertHero(updates = {}) {
+  await ensureHeroTable();
+
+  const currentRows = await sql`
+    SELECT
+      id,
+      full_name as "fullName",
+      short_description as "shortDescription",
+      long_description as "longDescription",
+      avatar
+    FROM hero
+    LIMIT 1
+  `;
+
+  if (currentRows.length === 0) {
+    const [row] = await sql`
+      INSERT INTO hero (id, full_name, short_description, long_description, avatar)
+      VALUES (
+        ${randomUUID()}::uuid,
+        ${updates.fullName ?? defaultHeroContent.fullName},
+        ${updates.shortDescription ?? defaultHeroContent.shortDescription},
+        ${updates.longDescription ?? defaultHeroContent.longDescription},
+        ${updates.avatar ?? defaultHeroContent.avatar}
+      )
+      RETURNING
+        id,
+        full_name as "fullName",
+        short_description as "shortDescription",
+        long_description as "longDescription",
+        avatar,
+        created_at as "createdAt",
+        updated_at as "updatedAt"
+    `;
+    return row;
+  }
+
+  const current = currentRows[0];
+  const payload = {
+    fullName: updates.fullName ?? current.fullName,
+    shortDescription: updates.shortDescription ?? current.shortDescription,
+    longDescription: updates.longDescription ?? current.longDescription,
+    avatar: updates.avatar ?? current.avatar,
+  };
+
+  const [row] = await sql`
+    UPDATE hero
+    SET
+      full_name = ${payload.fullName},
+      short_description = ${payload.shortDescription},
+      long_description = ${payload.longDescription},
+      avatar = ${payload.avatar},
+      updated_at = now()
+    WHERE id = ${current.id}::uuid
+    RETURNING
+      id,
+      full_name as "fullName",
+      short_description as "shortDescription",
+      long_description as "longDescription",
+      avatar,
+      created_at as "createdAt",
+      updated_at as "updatedAt"
+  `;
+
+  return row;
+}
+
 export { fetchProjects as getProjects };
