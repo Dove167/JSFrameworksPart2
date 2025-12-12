@@ -7,9 +7,9 @@ export const auth0 = new Auth0Client({
   appBaseUrl: process.env.APP_BASE_URL || process.env.AUTH0_BASE_URL,
   secret: process.env.AUTH0_SECRET,
   routes: {
-    login: "/auth/login",
-    logout: "/auth/logout",
-    callback: "/auth/callback"
+    login: "/api/auth/login",
+    logout: "/api/auth/logout",
+    callback: "/api/auth/callback"
   },
   session: {
     cookie: {
