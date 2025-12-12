@@ -47,7 +47,7 @@ export default function LogoutButton() {
 
   return (
     <motion.a
-      href="/api/auth/logout"
+      href="/auth/logout"
       className="inline-flex items-center justify-center rounded-md bg-red-600 px-6 py-3 text-sm font-medium text-white hover:bg-red-700 transition-colors relative overflow-hidden"
       variants={buttonVariants}
       initial="hidden"
